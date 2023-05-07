@@ -1,50 +1,29 @@
-/*global chrome*/
-import React, { useState, useEffect } from "react";
+/*global chrome*/                                   //I had an ESLint error that would throw up an error over chrome not being 
+import React, { useState, useEffect } from "react"; //defined while trying to make a build. The line of code on top bypasses that check.
 import "./App.css";
 
 function App() {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [text, setText] = useState("");
+  const [text, setText] = useState("");             
 
   useEffect(() => {
-    chrome.storage.sync.get(["position", "text"], (result) => {
-      if (result.position) {
-        setPosition(result.position);
-      }
-      if (result.text) {
-        setText(result.text);
+    chrome.storage.sync.get("text", (result) => {   //grabs the text saved into the chrome storage api
+      if (result.text) {                            //and displays it when in use, sending it into the 
+        setText(result.text);                       //hook
       }
     });
   }, []);
 
-  useEffect(() => {
-    chrome.storage.sync.set({ position, text });
-  }, [position, text]);
+  useEffect(() => {                                 //when text is entered it will update the text in
+    chrome.storage.sync.set({ text });              //the chrome storage api with the text hook
+  }, [text]);
 
-  const handleMouseDown = (e) => {
-    const startX = e.pageX - position.x;
-    const startY = e.pageY - position.y;
-
-    const handleMouseMove = (e) => {
-      setPosition({ x: e.pageX - startX, y: e.pageY - startY });
-    };
-
-    const handleMouseUp = () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-  };
-
-  const handleTextChange = (e) => {
-    setText(e.target.value);
+  const handleTextChange = (e) => {                 //on evernt it will update the text hook with what is
+    setText(e.target.value);                        //typed trigged by textarea onchange command
   };
 
   return (
-    <div className="notepad" style={{ top: position.y, left: position.x }}>
-      <div className="notepad-header" onMouseDown={handleMouseDown}>
+    <div className="notepad">
+      <div className="notepad-header">
         <span>Notepad</span>
       </div>
       <textarea className="notepad-textarea" value={text} onChange={handleTextChange} />

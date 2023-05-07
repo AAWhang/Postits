@@ -1,9 +1,9 @@
 {
-    "manifest_version": 2,
-    "name": "My Chrome Extension",
-    "version": "1.0",
-    "description": "My Chrome Extension Description",
-    "browser_action": {
+    "manifest_version": 2,                                  //I believe that Verion 2 is about to be phased out soon.
+    "name": "My Chrome Extension",                          //I went with Ver 2 instead of 3 because that's what the tutorials
+    "version": "1.0",                                       //were using as well as some more strict
+    "description": "My Chrome Extension Description",       //dependencies that I wasn't able to figure out in short notice
+    "browser_action": {                                     //while I was attempting to migrate to 3.
         "default_popup": "index.html",
         "default_title": "My Chrome Extension Title"
     },
