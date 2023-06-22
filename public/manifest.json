@@ -1,11 +1,11 @@
 {
     "manifest_version": 2,                                  //I believe that Verion 2 is about to be phased out soon.
-    "name": "My Chrome Extension",                          //I went with Ver 2 instead of 3 because that's what the tutorials
+    "name": "Notepad",                          //I went with Ver 2 instead of 3 because that's what the tutorials
     "version": "1.0",                                       //were using as well as some more strict
-    "description": "My Chrome Extension Description",       //dependencies that I wasn't able to figure out in short notice
+    "description": "Small Notepad to save notes saved directly to Chrome memory",       //dependencies that I wasn't able to figure out in short notice
     "browser_action": {                                     //while I was attempting to migrate to 3.
         "default_popup": "index.html",
-        "default_title": "My Chrome Extension Title"
+        "default_title": "Notepad"
     },
     "content_scripts": [
         {

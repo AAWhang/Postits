@@ -1,24 +1,73 @@
-/*global chrome*/                                   //I had an ESLint error that would throw up an error over chrome not being 
-import React, { useState, useEffect } from "react"; //defined while trying to make a build. The line of code on top bypasses that check.
+/*global chrome*/
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
-  const [text, setText] = useState("");             
+  const [text, setText] = useState("");
+
+  document.addEventListener("DOMContentLoaded", function () {
+  const textarea = document.querySelector(".notepad-textarea");
+
+  function adjustTextAreaHeight() {
+    textarea.style.height = "auto"; // Reset height to auto
+    textarea.style.height = textarea.scrollHeight + "px"; // Set height to scrollHeight
+  }
+
+  textarea.addEventListener("input", adjustTextAreaHeight);
+});
 
   useEffect(() => {
-    chrome.storage.sync.get("text", (result) => {   //grabs the text saved into the chrome storage api
-      if (result.text) {                            //and displays it when in use, sending it into the 
-        setText(result.text);                       //hook
+    // Retrieve the saved text from storage
+    chrome.storage.sync.get("text", (result) => {
+      if (result.text) {
+        setText(result.text);
+      }
+    });
+
+    // Retrieve the saved window size from storage
+    chrome.storage.local.get(["windowSize"], function (result) {
+      const { windowSize } = result;
+
+      // If window size exists, set the window dimensions
+      if (windowSize) {
+        const { width, height } = windowSize;
+        chrome.windows.getCurrent(function (window) {
+            chrome.windows.update(window.id, { width, height });
+        });
       }
     });
   }, []);
 
-  useEffect(() => {                                 //when text is entered it will update the text in
-    chrome.storage.sync.set({ text });              //the chrome storage api with the text hook
+  useEffect(() => {
+    // Update the saved text in storage
+    chrome.storage.sync.set({ text });
+
+    // Save the window size before closing the extension window
+    chrome.windows.onRemoved.addListener(function (windowId) {
+      chrome.windows.get(windowId, function (window) {
+        if (window.type === "normal") {
+          const { width, height } = window;
+
+          // Save the window size to storage
+          chrome.storage.local.set({ windowSize: { width, height } });
+        }
+      });
+    });
   }, [text]);
 
-  const handleTextChange = (e) => {                 //on evernt it will update the text hook with what is
-    setText(e.target.value);                        //typed trigged by textarea onchange command
+  const handleTextChange = (e) => {
+    setText(e.target.value);
+
+    // Get the current webpage's content and log it to the console
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      chrome.tabs.sendMessage(
+        tabs[0].id,
+        { type: "getPageContent" },
+        function (response) {
+          console.log(response.content);
+        }
+      );
+    });
   };
 
   return (
